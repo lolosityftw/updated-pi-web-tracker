@@ -1,46 +1,32 @@
-from nicegui import ui;
-from datetime import datetime
+from functions import *
 from testSensor import *
-import json;
+from datetime import datetime
+import threading
+import time as clock
+import os
 
-ui.dark_mode().auto
+c,t,h = 0,0,0
+r = open("data.txt", "r")
 
-
-now = datetime.now();
-time = now.strftime("%H:%M:%S");
-
-t,h = readSensor()
-temp = readSensor()
-
-print(temp[0])
-
-
-with ui.grid(columns=2):
-    ui.label('Time:')
-    timeLabel = ui.label()
-    ui.timer(1.0, lambda: timeLabel.set_text(datetime.now().strftime("%H:%M:%S")))
-
-    ui.label('Temperature:')
-    tLabel = ui.label()
-    ui.timer(1.0, lambda: tLabel.set_text(str(readSensor()[0]) + " C"))
-
-    ui.label('Humidity:')
-    hLabel = ui.label()
-    ui.timer(1.0, lambda: hLabel.set_text(str(readSensor()[1]) + " %"))
+def writefile():
+    while True:
+        f = open("data.txt", "a")
+        f.flush()
+        clock.sleep(1)
+        t,h = Sensor()
+        c = datetime.now().strftime("%H:%M:%S")
+        l = [c,t,h]
+        f.write(str(l) + "\n")
+        f.close()
 
 
 
-def writefile(time,temperature,humidity):
-    f = open("data.txt", "a")
-    l = [time,temperature,humidity]
-    f.write(str(l) + "\n")
-    f.close()
+threading.Thread(target=writefile, args=()).start()
 
+def readData():
+    print (r.tell())
 
+readData()
 
-ui.run()
-
-
-writefile(time,t,h)
-print("test")
+print(time)
 
